@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Models (too large for git)
+models/*.gguf
+models/*.bin
+
+# Vector database
+data/chroma_db/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# Debug files (development artifacts)
+debug*.py
+debug*.txt
+test_*.py
+*_debug.txt
+*_output.txt
+gp_chunk.txt
+search_*.py
+deep_debug.py
+
+# Streamlit cache
+.streamlit/cache/

@@ -1,0 +1,15 @@
+# Core ML / AI
+llama-cpp-python
+sentence-transformers
+chromadb
+
+# PDF Processing - Docling for advanced PDF->Markdown conversion
+docling
+PyMuPDF>=1.23.0  # Fallback
+
+# Frontend
+streamlit
+
+# Utilities
+huggingface-hub
+tqdm
