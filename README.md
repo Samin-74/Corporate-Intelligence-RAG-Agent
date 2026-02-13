@@ -159,12 +159,31 @@ Value        | Notes                                    |
 
 ## 🚢 Deployment
 
-See [DEPLOY.md](DEPLOY.md) for comprehensive deployment instructions including:
+### Local Deployment
+See [DEPLOY.md](DEPLOY.md) for local deployment instructions including:
 - Production configuration
-- Docker deployment
 - Performance tuning
 - Security best practices
 - Monitoring and troubleshooting
+
+### Cloud Deployment
+See [CLOUD_DEPLOY.md](CLOUD_DEPLOY.md) for hosting online:
+- **Hugging Face Spaces** (free tier, recommended for testing)
+- **AWS / GCP / Azure** (production-grade)
+- **Docker / Kubernetes** (containerized deployment)
+- **Replicate / Railway / Fly.io** (developer-friendly platforms)
+
+**Quick Deploy to Hugging Face Spaces:**
+```bash
+# Copy HF-specific README
+cp README_HF_SPACES.md README.md
+
+# Push to HF Spaces
+git remote add hf https://huggingface.co/spaces/YOUR_USERNAME/rag-agent
+git push hf main
+```
+
+See [CLOUD_DEPLOY.md](CLOUD_DEPLOY.md) for complete cloud deployment instructions and cost comparisons.
 
 **Conceptual Questions:**
 - "What are the main risk factors?"

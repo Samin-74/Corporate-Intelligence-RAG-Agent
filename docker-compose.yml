@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  rag-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      # Persist model files
+      - ./models:/app/models
+      # Persist vector database
+      - ./data:/app/data
+    environment:
+      # GPU settings
+      - N_GPU_LAYERS=-1
+      - CUDA_VISIBLE_DEVICES=0
+      # Model path
+      - LLM_MODEL_PATH=/app/models/Phi-4-mini-instruct-Q4_K_M.gguf
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
