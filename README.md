@@ -23,7 +23,7 @@ A **local, privacy-focused Financial Analyst chatbot** that runs entirely offlin
 ```
 PDF Upload → Semantic Chunking → Vector Embeddings (ChromaDB)
                                         ↓
-User Query → Vector Search (Top 25) ──┐
+User Query → Vector Search (Top 25) ───┐
            → Keyword Search (Top 15) ──┼→ Merge & Deduplicate
                                        └→ Cross-Encoder Re-Rank (Top 8)
                                                   ↓
