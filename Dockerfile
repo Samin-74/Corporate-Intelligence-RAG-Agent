@@ -28,10 +28,7 @@ RUN pip install --no-cache-dir llama-cpp-python
 # Copy application code
 COPY . .
 
-# Download model during build (comment out if using external model storage)
-# RUN python3 download_model.py
-
-# Create directories
+# Create directories (model auto-downloads on first run)
 RUN mkdir -p models data/chroma_db
 
 # Expose Streamlit port

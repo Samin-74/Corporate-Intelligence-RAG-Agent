@@ -95,7 +95,7 @@ class LLMGenerator:
         if not Path(self.model_path).exists():
             raise FileNotFoundError(
                 f"Model not found at {self.model_path}. "
-                f"Run `python download_model.py` to download it."
+                f"The model should auto-download on app startup. Check app initialization."
             )
 
         # Try GPU first, fall back to CPU

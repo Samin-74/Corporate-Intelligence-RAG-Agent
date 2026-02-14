@@ -17,27 +17,15 @@ if not exist "venv\Scripts\activate.bat" (
 )
 
 REM Activate virtual environment
-echo [1/3] Activating virtual environment...
+echo [1/2] Activating virtual environment...
 call venv\Scripts\activate.bat
 
-REM Check if model exists
-if not exist "models\Phi-4-mini-instruct-Q4_K_M.gguf" (
-    echo.
-    echo [WARNING] Model not found!
-    echo Downloading Phi-4 Mini model... (this may take a few minutes)
-    echo.
-    python download_model.py
-    if errorlevel 1 (
-        echo [ERROR] Model download failed!
-        pause
-        exit /b 1
-    )
-)
-
-REM Start Streamlit
+REM Start Streamlit (model auto-downloads on first run)
 echo.
-echo [2/3] Starting Streamlit app...
-echo [3/3] Opening browser at http://localhost:8501
+echo [NOTE] Model will download automatically on first run (~2-3 minutes)
+echo.
+echo [2/2] Starting Streamlit app...
+echo Opening browser at http://localhost:8501
 echo.
 echo ========================================
 echo   Press Ctrl+C to stop the server

@@ -337,8 +337,7 @@ ALB (Load Balancer) → ECS Fargate (Streamlit) → EFS (Model Storage)
    
    COPY . .
    
-   # Download model during build
-   RUN python download_model.py
+   # Model auto-downloads on first run
    
    EXPOSE 8080
    
@@ -434,9 +433,10 @@ ALB (Load Balancer) → ECS Fargate (Streamlit) → EFS (Model Storage)
 
 ## 📦 Model Hosting Solutions
 
-### Option A: Hugging Face Model Hub (Recommended)
+### Built-in Auto-Download (Already Implemented!) ✅
+The app automatically downloads the model from Hugging Face Hub on first run:
 ```python
-# In download_model.py or app startup
+# Already implemented in app.py - ensure_model_downloaded()
 from huggingface_hub import hf_hub_download
 
 model_path = hf_hub_download(

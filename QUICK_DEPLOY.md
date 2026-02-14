@@ -147,17 +147,14 @@ All deployment files are ready:
    cd Corporate-Intelligence-RAG-Agent
    ```
 
-2. **Download model:**
-   ```bash
-   python download_model.py
-   ```
-
-3. **Build and run with Docker Compose:**
+2. **Build and run with Docker Compose:**
    ```bash
    docker-compose up --build
    ```
 
-4. **Access at:** `http://localhost:8501`
+3. **Access at:** `http://localhost:8501`
+
+   **Note:** Model downloads automatically on first run (~2-3 minutes)
 
 **For CPU-only mode:**
 ```bash
