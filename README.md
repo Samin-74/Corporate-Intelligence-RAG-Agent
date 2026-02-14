@@ -23,7 +23,7 @@ A **local, privacy-focused Financial Analyst chatbot** that runs entirely offlin
 ```
 PDF Upload → Semantic Chunking → Vector Embeddings (ChromaDB)
                                         ↓
-User Query → Vector Search (Top 25) ──┐
+User Query → Vector Search (Top 25) ───┐
            → Keyword Search (Top 15) ──┼→ Merge & Deduplicate
                                        └→ Cross-Encoder Re-Rank (Top 8)
                                                   ↓
@@ -139,7 +139,7 @@ RAG/
 │   └── chroma_db/          # Vector database (gitignored)
 └── sample_docs/            # Sample PDFs for testing
 ```
-Value        | Notes                                    |
+|                         | Value          | Notes                                  |
 | ----------------------- | ------------ | ---------------------------------------- |
 | VRAM Usage              | ~3.0 GB      | Phi-4 Mini Q4_K_M + embeddings           |
 | Time to First Token     | < 1 second   | After initial model warmup               |
