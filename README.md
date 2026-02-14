@@ -100,22 +100,13 @@ pip install llama-cpp-python
 CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python
 ```
 
-### 3. Download the LLM
+### 3. Run the Application
 
-Download the Phi-4 Mini GGUF model:
 ```bash
-pythstart.bat / start.sh    # One-click startup scripts
-├── download_model.py       # Model downloader script
-├── requirements.txt        # Python dependencies
-├── config.py               # Centralized configuration
-├── .env.example            # Environment variable template
-├── DEPLOY.md               # Deployment guide
-├── src/
-│   ├── __init__.py
-│   ├── ingestion.py        # PDF loading & chunking (Docling + PyMuPDF)
-│   ├── vector_store.py     # ChromaDB operations
-│   ├── retriever.py        # Hybrid search (vector + keyword + reranking)
+streamlit run app.py
 ```
+
+The model will automatically download on first run (~2-3 minutes with progress indicators).
 
 Open `http://localhost:8501` in your browser. Upload a PDF and start chatting!
 
@@ -123,18 +114,21 @@ Open `http://localhost:8501` in your browser. Upload a PDF and start chatting!
 
 ```
 RAG/
-├── app.py                  # Streamlit UI entry point
-├── download_model.py       # Model downloader script
+├── app.py                  # Streamlit UI with auto-download & auto-config
+├── start.bat / start.sh    # One-click startup scripts
 ├── requirements.txt        # Python dependencies
 ├── config.py               # Centralized configuration
+├── .env.example            # Environment variable template
+├── CLOUD_DEPLOY.md         # Cloud deployment guide
+├── QUICK_DEPLOY.md         # Quick deployment guide
 ├── src/
 │   ├── __init__.py
-│   ├── ingestion.py        # PDF loading & chunking
+│   ├── ingestion.py        # PDF loading & chunking (Docling + PyMuPDF)
 │   ├── vector_store.py     # ChromaDB operations
-│   ├── retriever.py        # Dense retrieval + re-ranking
+│   ├── retriever.py        # Hybrid search (vector + keyword + reranking)
 │   ├── llm.py              # LLM loading & generation
 │   └── rag_pipeline.py     # Orchestrates the full pipeline
-├── models/                 # GGUF model files (gitignored)
+├── models/                 # GGUF model files (auto-downloaded, gitignored)
 ├── data/
 │   └── chroma_db/          # Vector database (gitignored)
 └── sample_docs/            # Sample PDFs for testing
@@ -159,31 +153,22 @@ RAG/
 
 ## 🚢 Deployment
 
-### Local Deployment
-See [DEPLOY.md](DEPLOY.md) for local deployment instructions including:
-- Production configuration
-- Performance tuning
-- Security best practices
-- Monitoring and troubleshooting
-
-### Cloud Deployment
-See [CLOUD_DEPLOY.md](CLOUD_DEPLOY.md) for hosting online:
-- **Hugging Face Spaces** (free tier, recommended for testing)
-- **AWS / GCP / Azure** (production-grade)
+### Cloud Deployment ⭐ Recommended: Railway
+See [CLOUD_DEPLOY.md](CLOUD_DEPLOY.md) and [QUICK_DEPLOY.md](QUICK_DEPLOY.md) for hosting online:
+- **Railway** (recommended - 10GB storage, auto-deploy, ~$5/month)
+- **Fly.io** (50GB storage, developer-friendly)
+- **AWS / GCP / Azure** (production-grade, unlimited storage)
 - **Docker / Kubernetes** (containerized deployment)
-- **Replicate / Railway / Fly.io** (developer-friendly platforms)
 
-**Quick Deploy to Hugging Face Spaces:**
-```bash
-# Copy HF-specific README
-cp README_HF_SPACES.md README.md
+⚠️ **Not Hugging Face Spaces** - 1GB storage limit is too small for 2.3GB model
 
-# Push to HF Spaces
-git remote add hf https://huggingface.co/spaces/YOUR_USERNAME/rag-agent
-git push hf main
-```
+**Quick Deploy to Railway:**
+1. Create account at https://railway.app
+2. Click "New Project" → "Deploy from GitHub repo"
+3. Select `Samin-74/Corporate-Intelligence-RAG-Agent`
+4. Railway auto-deploys! Model downloads automatically on first run (~5-7 min total)
 
-See [CLOUD_DEPLOY.md](CLOUD_DEPLOY.md) for complete cloud deployment instructions and cost comparisons.
+See [CLOUD_DEPLOY.md](CLOUD_DEPLOY.md) for complete instructions and cost comparisons.
 
 **Conceptual Questions:**
 - "What are the main risk factors?"
