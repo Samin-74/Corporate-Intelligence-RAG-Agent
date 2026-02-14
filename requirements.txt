@@ -2,6 +2,7 @@
 llama-cpp-python
 sentence-transformers
 chromadb
+torch>=2.0.0  # For GPU detection
 
 # PDF Processing - Docling for advanced PDF->Markdown conversion
 docling

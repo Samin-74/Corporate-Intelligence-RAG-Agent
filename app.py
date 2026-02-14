@@ -21,6 +21,84 @@ import config
 
 
 # ──────────────────────────────────────────────
+# Auto-Download Model with Progress
+# ──────────────────────────────────────────────
+@st.cache_resource(show_spinner=False)
+def ensure_model_downloaded():
+    """Download model if not present, with progress indicator."""
+    model_path = Path(config.LLM_MODEL_PATH)
+    
+    if model_path.exists():
+        return str(model_path), "Model already available"
+    
+    # Model not found - download it
+    try:
+        from huggingface_hub import hf_hub_download
+        import requests
+        
+        st.info("🔄 First run detected - downloading AI model...")
+        
+        with st.status("Downloading Phi-4 Mini model (~2.3GB)...", expanded=True) as status:
+            status.write("📡 Connecting to Hugging Face Hub...")
+            
+            # Download with progress
+            downloaded_path = hf_hub_download(
+                repo_id=config.LLM_MODEL_REPO,
+                filename=config.LLM_MODEL_FILE,
+                local_dir=str(model_path.parent),
+                local_dir_use_symlinks=False
+            )
+            
+            status.write("✅ Model downloaded successfully!")
+            status.update(label="Model ready", state="complete", expanded=False)
+            
+        return downloaded_path, "Downloaded successfully"
+        
+    except Exception as e:
+        st.error(f"❌ Failed to download model: {e}")
+        st.info("""**Alternative:** Run locally and download manually:
+        ```bash
+        python download_model.py
+        ```""")
+        return None, f"Download failed: {e}"
+
+
+# ──────────────────────────────────────────────
+# Auto-Detect GPU
+# ──────────────────────────────────────────────
+@st.cache_resource(show_spinner=False)
+def detect_gpu():
+    """Detect if GPU is available and return appropriate settings."""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            gpu_name = torch.cuda.get_device_name(0)
+            vram_gb = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+            return True, gpu_name, vram_gb
+    except:
+        pass
+    
+    return False, None, 0
+
+
+# ──────────────────────────────────────────────
+# Auto-Configure Based on Hardware
+# ──────────────────────────────────────────────
+def auto_configure_system():
+    """Auto-detect hardware and configure appropriately."""
+    has_gpu, gpu_name, vram_gb = detect_gpu()
+    
+    if has_gpu:
+        # GPU detected - use it
+        config.LLM_N_GPU_LAYERS = -1  # All layers on GPU
+        return f"GPU detected: {gpu_name} ({vram_gb:.1f}GB VRAM)"
+    else:
+        # CPU only
+        config.LLM_N_GPU_LAYERS = 0
+        return "CPU mode (no GPU detected)"
+
+
+# ──────────────────────────────────────────────
 # Custom CSS
 # ──────────────────────────────────────────────
 st.set_page_config(
@@ -81,57 +159,60 @@ init_session_state()
 
 
 # ──────────────────────────────────────────────
+# Auto-Initialize on First Load
+# ──────────────────────────────────────────────
+if not st.session_state.initialized and "auto_init_attempted" not in st.session_state:
+    st.session_state.auto_init_attempted = True
+    
+    # Auto-download model if needed
+    model_path, download_msg = ensure_model_downloaded()
+    
+    if model_path:
+        # Auto-configure based on hardware
+        hardware_msg = auto_configure_system()
+        
+        # Auto-initialize the system
+        with st.status("Initializing AI system...", expanded=True) as status:
+            try:
+                status.write(f"🖥️ {hardware_msg}")
+                status.write("📦 Loading models...")
+                
+                from src.rag_pipeline import RAGPipeline
+                
+                pipeline = RAGPipeline()
+                timings = pipeline.initialize()
+                
+                st.session_state.pipeline = pipeline
+                st.session_state.initialized = True
+                st.session_state.llm_info = timings.get("llm_info", {})
+                st.session_state.llm_info["hardware"] = hardware_msg
+                st.session_state.ingested_files = set(pipeline.get_sources())
+                
+                status.write("✅ System ready!")
+                status.update(label="Ready to use", state="complete", expanded=False)
+                time.sleep(0.5)
+                st.rerun()
+                
+            except Exception as e:
+                status.update(label="Initialization failed", state="error")
+                st.error(f"❌ Initialization error: {e}")
+                st.info("Please try refreshing the page. If the issue persists, check the logs.")
+
+
+# ──────────────────────────────────────────────
 # Sidebar
 # ──────────────────────────────────────────────
 with st.sidebar:
     st.title("🧠 Edge RAG Agent")
-    st.caption("100% Local • Zero Cost • GPU-Accelerated")
+    st.caption("100% Local • Zero Cost • Auto-Configured")
     st.divider()
 
     # ── System Status ──
     st.subheader("⚡ System Status")
 
     if not st.session_state.initialized:
-        backend = st.radio(
-            "LLM Backend",
-            ["llama_cpp", "ollama"],
-            index=0,
-            help="**llama_cpp**: Direct GGUF loading.\n**Ollama**: Alternative backend.",
-        )
-
-        if st.button("🚀 Initialize System", use_container_width=True, type="primary"):
-            config.LLM_BACKEND = backend
-            status = st.status("Initializing...", expanded=True)
-            try:
-                status.write("📦 Loading embedding model...")
-                from src.rag_pipeline import RAGPipeline
-
-                pipeline = RAGPipeline()
-                timings = pipeline.initialize()
-
-                st.session_state.pipeline = pipeline
-                st.session_state.initialized = True
-                st.session_state.llm_info = timings.get("llm_info", {})
-                st.session_state.ingested_files = set(pipeline.get_sources())
-
-                status.write("✅ All models loaded!")
-                for comp, t in timings.items():
-                    if comp != "llm_info" and isinstance(t, (int, float)):
-                        status.write(f"  {comp}: {t:.1f}s")
-
-                status.update(label="System Ready", state="complete", expanded=False)
-                time.sleep(0.5)
-                st.rerun()
-            except FileNotFoundError as e:
-                status.update(label="Failed", state="error")
-                st.error(f"❌ {e}")
-                st.info("Run `python download_model.py` to download the model.")
-            except ConnectionError as e:
-                status.update(label="Failed", state="error")
-                st.error(f"❌ {e}")
-            except Exception as e:
-                status.update(label="Failed", state="error")
-                st.error(f"❌ {e}")
+        st.info("🔄 Initializing system automatically...")
+        st.caption("This may take a moment on first run.")
     else:
         st.success("✅ System Online")
         pipeline: RAGPipeline = st.session_state.pipeline
@@ -141,6 +222,7 @@ with st.sidebar:
         llm_info = st.session_state.llm_info
         backend_label = llm_info.get("backend", "unknown")
         model_label = llm_info.get("model", "?")
+        hardware_info = llm_info.get("hardware", "Unknown")
 
         model_size_str = ""
         if backend_label == "llama_cpp" and Path(config.LLM_MODEL_PATH).exists():
@@ -148,6 +230,7 @@ with st.sidebar:
             model_size_str = f" ({size_mb:.0f}MB)"
 
         st.caption(f"🤖 {backend_label} — {model_label}{model_size_str}")
+        st.caption(f"🖥️ {hardware_info}")
         st.metric("Chunks in DB", doc_count)
 
         if sources:
