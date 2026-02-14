@@ -1,6 +1,6 @@
 # Quick Deployment Guide 🚀
 
-Your RAG agent is now on GitHub! Here's how to deploy it online quickly.
+Your RAG agent is now on GitHub with **auto-download** and **auto-configuration**!
 
 ---
 
@@ -12,18 +12,72 @@ All deployment files are ready:
 - ✅ `CLOUD_DEPLOY.md` — Comprehensive cloud deployment guide
 - ✅ `Dockerfile` — Container image for Docker/Kubernetes
 - ✅ `docker-compose.yml` — Easy Docker Compose setup
-- ✅ `README_HF_SPACES.md` — Hugging Face Spaces configuration
-- ✅ `app_hf_spaces.py` — HF Spaces app with auto model download
+- ✅ **Auto-download model** on first run with progress indicators
+- ✅ **Auto-detect GPU/CPU** and configure accordingly
 
 ---
 
 ## 🎯 Fastest Deployment Options
 
-### Option 1: Hugging Face Spaces (FREE) ⭐ Recommended
+### Option 1: Railway ⭐ RECOMMENDED
+
+**Best for:** Quick deployment, automatic model download, production use  
+**Cost:** Free tier available (~$5/month for hobby projects)  
+**Setup time:** 5 minutes  
+**Storage:** 10GB persistent (perfect for 2.3GB model!)
+
+#### Steps:
+1. **Create Railway account:** https://railway.app
+2. **Create new project:**
+   - Click "New Project"
+   - Select "Deploy from GitHub repo"
+   - Connect your GitHub account
+   - Select `Samin-74/Corporate-Intelligence-RAG-Agent`
+3. **Railway auto-detects** Streamlit and deploys
+4. **First run takes 5-7 minutes:**
+   - Railway build: ~2-3 minutes
+   - Model auto-download: ~2-3 minutes (shows progress in app)
+   - Vectorstore creation: ~1 minute
+5. **Done!** Your app is live with automatic model download
+
+**No manual configuration needed** - the app handles everything!
+
+---
+
+### Option 2: Hugging Face Spaces ❌ NOT RECOMMENDED
+
+**Why Not:** HF Spaces has **1GB storage limit**, but our model is **2.3GB**. Auto-download will fail.
+
+**Use Railway, Fly.io, or Docker instead!**
+
+<details>
+<summary>If HF Spaces increases storage limits in future...</summary>
 
 **Best for:** Testing, demos, portfolio  
 **Cost:** Free (with GPU limits)  
 **Setup time:** 5 minutes
+
+#### Steps:
+1. **Create HF account:** https://huggingface.co/join
+2. **Create new Space:**
+   - Go to https://huggingface.co/spaces
+   - Click "Create new Space"
+   - Name: `corporate-rag-agent`
+   - SDK: **Streamlit**
+   - Hardware: **CPU basic** (free) or **ZeroGPU** (free with limits)
+   - Visibility: Public or Private
+
+3. **Clone your Space locally:**
+   ```bash
+   git clone https://huggingface.co/spaces/YOUR_USERNAME/corporate-rag-agent
+   cd corporate-rag-agent
+   ```
+
+4. **Copy files from your GitHub repo:**
+   ```bash
+   # Copy all necessary files
+   cp -r ../RAG/* .
+
 
 #### Steps:
 1. **Create HF account:** https://huggingface.co/join
@@ -71,9 +125,11 @@ All deployment files are ready:
 
 **Note:** CPU mode is slower (1-2 tok/s vs 20-40 tok/s on GPU). Upgrade to ZeroGPU or T4 for better performance.
 
+</details>
+
 ---
 
-### Option 2: Docker (Self-Hosted)
+### Option 3: Docker (Self-Hosted)
 
 **Best for:** Full control, private deployment  
 **Cost:** Your server costs  

@@ -6,25 +6,39 @@ This guide covers deploying the Edge RAG Agent to various cloud platforms, makin
 
 ## 📋 Deployment Considerations
 
-### Model File Challenges
-The LLM model file (`Phi-4-mini-instruct-Q4_K_M.gguf`, ~2.3GB) is **too large for GitHub**. You have several options:
+### Auto-Download & Auto-Configuration ✨
+The app now **automatically downloads the model on first run** with progress indicators! It also:
+- Auto-detects GPU/CPU and configures accordingly
+- Initializes the system without manual button clicks
+- Shows clear status messages during download
+- Displays hardware info in the sidebar
 
-1. **Host model separately** (Hugging Face Model Hub, AWS S3, Google Cloud Storage)
-2. **Download on startup** (download_model.py script)
-3. **Use platform-specific model storage** (Hugging Face Spaces Cache)
-4. **Switch to Ollama** (pulls models automatically)
+**No manual setup needed** - just deploy and run!
+
+### Model File Information
+The LLM model file (`Phi-4-mini-instruct-q4_k_m.gguf`, ~2.3GB) downloads automatically from Hugging Face Hub (`professorf/Phi-4-mini-instruct-gguf`).
+
+**Storage Requirements:**
+- ✅ **Railway:** 10GB persistent storage (works great!)
+- ✅ **Fly.io:** 50GB persistent volumes (perfect!)
+- ✅ **AWS/GCP/Azure:** Unlimited (no issues)
+- ❌ **Hugging Face Spaces:** 1GB limit (too small for model)
 
 ### Resource Requirements
-- **Minimum:** 8GB RAM, 4GB GPU VRAM (T4 / RTX 3050 Ti)
-- **Recommended:** 16GB RAM, 8GB GPU VRAM (A10 / RTX 3060+)
+- **Minimum:** 8GB RAM, 3GB storage, 4GB GPU VRAM (T4 / RTX 3050 Ti)
+- **Recommended:** 16GB RAM, 5GB storage, 8GB GPU VRAM (A10 / RTX 3060+)
 - **CPU-only mode:** Possible but slow (1-2 tok/s vs 20-40 tok/s on GPU)
 
 ---
 
-## 🚀 Option 1: Hugging Face Spaces (Recommended for Free Tier)
+## 🚀 Option 1: Hugging Face Spaces ⚠️ NOT RECOMMENDED
 
-**Pros:** Free GPU quota, built-in model storage, easy setup  
-**Cons:** Limited GPU hours (unless upgraded), public by default
+**Why Not:** Hugging Face Spaces has a **1GB storage limit**, but our model is **2.3GB**. Auto-download will fail.
+
+**Alternative:** Use Railway, Fly.io, AWS, GCP, or Azure instead (they have adequate storage).
+
+<details>
+<summary>If HF Spaces increases storage limits in future...</summary>
 
 ### Setup Steps
 
@@ -353,21 +367,26 @@ ALB (Load Balancer) → ECS Fargate (Streamlit) → EFS (Model Storage)
 
 ---
 
-## 🔧 Option 5: Railway / Fly.io (Developer-Friendly)
+## 🔧 Option 5: Railway / Fly.io ✅ RECOMMENDED
 
-**Pros:** Simple deployment, affordable, quick setup  
-**Cons:** No free GPU tier, limited resources on free tier
+**Why These?** Both platforms have adequate storage (10GB+ persistent volumes) for auto-downloading the 2.3GB model.
 
-### Railway Setup
+**Pros:** Simple deployment, affordable, quick setup, automatic model download works perfectly  
+**Cons:** No free GPU tier (CPU-only mode works but slower)
 
-1. **Connect GitHub repo** at https://railway.app
-2. **Add environment variables**:
+### Railway Setup (Easiest!)
+
+1. **Create account** at https://railway.app
+2. **Connect GitHub repo**: Click "New Project" → "Deploy from GitHub repo" → Select `Corporate-Intelligence-RAG-Agent`
+3. **Add environment variables** (optional):
    ```
    STREAMLIT_SERVER_PORT=8080
-   N_GPU_LAYERS=-1
    ```
-3. **Railway will auto-detect** Streamlit and deploy
-4. **Upgrade to GPU instance** (if available, ~$20-50/month)
+4. **Railway auto-detects** Streamlit and deploys automatically!
+5. **Model downloads on first run** (~2-3 minutes) with progress indicators in the app
+6. **Upgrade to GPU instance** if needed (~$20-50/month for faster responses)
+
+**First deployment takes ~5-7 minutes** (2-3 min for Railway build, 2-3 min for model download, 1 min for vectorstore creation)
 
 ### Fly.io Setup
 
