@@ -139,7 +139,7 @@ RAG/
 │   └── chroma_db/          # Vector database (gitignored)
 └── sample_docs/            # Sample PDFs for testing
 ```
-Value        | Notes                                    |
+|                         | Value          | Notes                                  |
 | ----------------------- | ------------ | ---------------------------------------- |
 | VRAM Usage              | ~3.0 GB      | Phi-4 Mini Q4_K_M + embeddings           |
 | Time to First Token     | < 1 second   | After initial model warmup               |
